@@ -418,6 +418,10 @@ if(currentTimer-timer>=1000){
 	timer=currentTimer;
 	if(countdown>0){countdown--}
 }
+//give coins
+if(keyIsDown(67)){
+	coins++;
+}
 //forest
 noStroke();
 fill(0,135,18)
@@ -650,23 +654,28 @@ let distance = sqrt(distanceX*distanceX+distanceY*distanceY);
 		i--
 		break;}}}
 		//for boss1
-	for(let i=0;i<boss1s.length;i++){
-		let boss1 = boss1s[i]
-		for(i2=1;i2<6;i2++){
-			let angle = 0
-		if (playerDirection == 1){angle = 0;}
-		if (playerDirection == 2){angle = PI;}
-		if (playerDirection == 3){angle = -HALF_PI;}
-		if (playerDirection == 4){angle = HALF_PI;}
-			let angle2 = swingAngle + angle;
+	for(let i=0;i<boss1s.length;i++){//for hver element in boss1s array'en.
+										//(dog kan kun en existere på samme tid)
+		let boss1 = boss1s[i]//sæt den nuværende boss1
+		for(i2=1;i2<6;i2++){//loop 6 gange for at lave kollision på hele sværdets længde
+			let angle = 0//erklær angle og tildel den værdien 0
+		if (playerDirection == 1){angle = 0;}//hvis man kigger op, tildel angle værdien 0
+		if (playerDirection == 2){angle = PI;}//hvis man kigger ned, tildel angle værdien PI
+		if (playerDirection == 3){angle = -HALF_PI;}//hvis man kigger til venste, tildel angle -HALF_PI
+		if (playerDirection == 4){angle = HALF_PI;}//hvis man kigger til høkre, tildel angle half_pi
+			let angle2 = swingAngle + angle;//erklær angle2 og tildel den værdien swingAngle + angle
 			let swordX = playerX + cos(angle2) * (10 * i2)
 			let swordY = playerY + sin(angle2) * (10 * i2);
-let distanceX = swordX-boss1.x
-let distanceY = swordY-boss1.y
-let distance = sqrt(distanceX*distanceX+distanceY*distanceY);
-	if(distance<(boss1.size/2)){
-		boss1.hurting();
-		break;}}}
+			//find og sæt koordinaterne for sværdet ud fra spillerens position og dens nuværende angle
+			// i sin animation. 10*i2 gør at hele sværdets længe bliver tjekket
+let distanceX = swordX-boss1.x//find distancen mellem x værdien af sværdet og boss1's x værdi
+let distanceY = swordY-boss1.y//find distancen mellem y værdien af sværdet og boss1's y værdi
+let distance = sqrt(distanceX*distanceX+distanceY*distanceY);//find distancen mellem sværd og boss1
+//															 ud fra distanceX og distanceY variablerne
+	if(distance<(boss1.size/2)){//hvis de kollidere
+		boss1.hurting();//kald boss1's funktion "hurting" som får boss1 til at miste liv
+						//funktionen bliver erklæret i boss1's class
+		break;}}}//stop de 6 loops for ikke at kalde hurting() flere gange en man skal 
 }
 function nextRound(){
 	if(maxHealthButton){maxHealthButton.remove()}
@@ -684,6 +693,9 @@ if(round<10){
 		boss1s.push(new Boss1());}
 		if(round<20&&round>10){
 			countdown=30;}
+			if(round==20){
+				countdown=60;
+			}
 		if(round<11){
 	for (let i = 0; i < 20; i++) {
 		summonBlob();}
@@ -718,12 +730,39 @@ if(round>8){
 	setTimeout(()=>{for(let i = 0; i < 5; i++) {
 		summonArcher();}},20000);}}
 	if(round>10){
-
+		for (let i = 0; i < 5; i++) {
+			summonArcher();}
+			for (let i = 0; i < 10; i++) {
+				summonShadow();}
+				for (let i = 0; i < 10; i++) {
+					summonBlob();}
+		setTimeout(()=>{for(let i = 0; i < 5; i++) {
+			summonArcher();}
+			for (let i = 0; i < 10; i++) {
+				summonShadow();}
+				for (let i = 0; i < 10; i++) {
+					summonBlob();}
+		},10000);
+		setTimeout(()=>{for(let i = 0; i < 5; i++) {
+			summonArcher();}
+			for (let i = 0; i < 10; i++) {
+				summonShadow();}
+				for (let i = 0; i < 10; i++) {
+					summonBlob();}
+			canEndRoundEarly=true;
+		},20000);
 		
 	}
 gameState=1;
 }//when timer is 0 do shop phase
 function shopPhase(){
+	if(maxHealthButton){maxHealthButton.remove()}
+	if(forestButton){forestButton.remove()}
+	if(attackSpeedButton){attackSpeedButton.remove()}
+	if(movementSpeedButton){movementSpeedButton.remove()}
+	if(magnetButton){magnetButton.remove()}
+	if(vampireButton){vampireButton.remove()}
+	if(crossButton){crossButton.remove()}
 canEndRoundEarly=false;
 blobs=[];
 shadows=[];
@@ -855,8 +894,36 @@ function summonArcher(){
 	if(distance>150){canPlace=true;}}
 	archers.push(new Archer(proposedX, proposedY));
 }
-//vampire amulet after round 3
-//cross necklace after round 6
+
+function keyPressed(){
+	if(keyIsDown(82)&&gameState==2){
+		round++;
+		shopPhase();
+	}
+	if(keyIsDown(82)&&gameState==1){
+		blobs=[];
+		archers=[];
+		shadows=[];
+		boss1s=[];
+	}
+}
+//things to add/ideas, later me
+//vampire amulet after round 3//done
+//5% chance of dropping heart
+
+//cross necklace after round 6//done
+//double iFrames
+
 //bullet time after round 9
-//vampire amulet 2 electro boogaloo after round 10
-//dmg bonus after round 13
+//decrease bullet speed by 50% when near you or something
+// could be done in the bullet class with a this.bulletTime = 1 in fabricator
+//this.bulletTime would be 1 default and therefore not do anything but if it was 2 then you could
+//go to the movement one and say this.x+=thix.bx/bulletTime
+
+//vampire amulet 2 electro boogaloo after round 10//done
+//10% chance of dropping heart now
+
+//dmg bonus stat after round 13
+//when more enemies have more hp than 1
+
+//maybe a bigger sword upgrade but would be annoying to implement
