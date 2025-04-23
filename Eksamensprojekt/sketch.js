@@ -503,7 +503,8 @@ if(gameState==2){
 	text("Buy Magnet Upgrade:",755,40)
 	textSize(14)
 	text("Increase magnet range-",755,60)
-	text(`and pick-up speed by ${(magnetLevel+1)*20}%`,755,80)
+	if(magnetLevel<5){text(`and pick-up speed by ${(magnetLevel+1)*20}%`,755,80)}
+	else{text(`and pick-up speed by 100%`,755,80)}
 	textSize(16)
 	if(magnetLevel<5){text(`Price: ${magnetPrice} coins`,755,100)}
 	if(magnetLevel==5){text(`Max Level Reached`,755,100)}
